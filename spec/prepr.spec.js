@@ -9,6 +9,19 @@ var z = x * 2;";
         expect(prepr.preprocess(input, ["PROD"])).toBe(expected);
     });
 
+    it("keeps line breaks if keepLineBreaks option is provided", function() {
+        var input = "#ifdef var1\r\n\
+line1\r\n\
+#endif\r\n\
+line2";
+        var expected = "\r\n\
+line1\r\n\
+\r\n\
+line2";
+
+        expect(prepr.preprocess(input, ["var1"], {keepLineBreaks: true})).toBe(expected);
+    });
+
     it("produces Windows line endings in output if they are used in input", function() {
         var input = "#ifdef var1\r\n\
 line1\r\n\
