@@ -63,6 +63,12 @@ grunt.initConfig({
       defined: ["DEBUG"],
       src: "in/**/*.js",
       dest: "."
+    },
+    //Preserving blank lines when directives have been processed: using option keepLineBreaks
+    target6: {
+      src: "in/*.js",
+      dest: ".",
+      keepLineBreaks: true
     }
   }
 });

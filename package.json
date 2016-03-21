@@ -1,7 +1,7 @@
 {
   "name": "grunt-prepr",
   "description": "Grunt preprocessor plugin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/antivanov/grunt-prepr",
   "main": "index.js",
   "author": {

@@ -26,8 +26,9 @@
         }
     };
 
-    ConditionalDirective.prototype.processLine = function(line) {
-        return this.ignoreContent ? this.outputLineSeparator : line + this.outputLineSeparator;
+    ConditionalDirective.prototype.processLine = function(line, options) {
+        return this.ignoreContent ? (options.keepLineBreaks ? this.outputLineSeparator : "")
+        : line + this.outputLineSeparator;
     };
 
     ConditionalDirective.prototype.invert = function() {
@@ -138,9 +139,9 @@ $ as the first symbol and can start with letter or digit or $");
         return new Macro(preprocessor).parse(definition);
     };
 
-    function Preprocessor(input, predefinedVariables) {
+    function Preprocessor(input, predefinedVariables, options) {
         this.input = input;
-
+        this.options = options || {};
         if (typeof predefinedVariables === "string") {
             predefinedVariables = [ predefinedVariables ];
         } else if (predefinedVariables === undefined) {
@@ -209,30 +210,27 @@ $ as the first symbol and can start with letter or digit or $");
 
         for (var i = 0; i < lines.length; i++) {
             var line = lines[i], currentMacro = null, topConditionalDirective = this.directivesStack[this.directivesStack.length - 1];
+            var hasProcessedDirective = true;
 
             if (/#ifn?def/.exec(line)) {
                 this.directivesStack.push(ConditionalDirective
                         .create(this, line, this.outputLineSeparator,
                                 topConditionalDirective));
-                output += this.outputLineSeparator;
             } else if (/#endif/.exec(line)) {
                 if (this.directivesStack.length === 0) {
                     throw new Error("Found #endif without opening directive");
                 }
                 this.directivesStack.pop();
-                output += this.outputLineSeparator;
             } else if (/#else/.exec(line)) {
                 if (topConditionalDirective) {
                     topConditionalDirective.invert();
                 } else {
                     throw new Error("Found #else without opening directive");
                 }
-                output += this.outputLineSeparator;
             } else if (/#define/.exec(line)) {
                 currentMacro = Macro.create(this, line);
 
                 this.macros[currentMacro.name] = currentMacro;
-                output += this.outputLineSeparator;
             } else if (/#undef/.exec(line)) {
                 var match = /#undef\s+([a-zA-Z][a-zA-Z0-9_]*)(?:\*\/)?$/
                         .exec(line);
@@ -240,12 +238,14 @@ $ as the first symbol and can start with letter or digit or $");
                 if (match) {
                     this.undefine(match[1]);
                 }
-                output += this.outputLineSeparator;
             } else {
-                line = topConditionalDirective ? topConditionalDirective
-                        .processLine(line) : line + this.outputLineSeparator;
+                hasProcessedDirective = false;
+                line = topConditionalDirective ? topConditionalDirective.processLine(line, this.options) : line + this.outputLineSeparator;
                 line = this.applyMacros(line);
                 output = output + line;
+            }
+            if (hasProcessedDirective && this.options.keepLineBreaks) {
+                output += this.outputLineSeparator;
             }
         }
 
@@ -263,8 +263,8 @@ $ as the first symbol and can start with letter or digit or $");
     };
 
     var exported = {
-        preprocess : function(input, predefinedVariables) {
-            return new Preprocessor(input, predefinedVariables).run();
+        preprocess : function(input, predefinedVariables, options) {
+            return new Preprocessor(input, predefinedVariables, options).run();
         }
     };
 

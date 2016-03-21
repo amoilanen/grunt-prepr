@@ -7,8 +7,8 @@ module.exports = function(grunt) {
       //Mask, output directory specified
       target1: {
         defined: ["PROD"],
-          src: "in/*.js",
-            dest: "."
+        src: "in/*.js",
+        dest: "."
       },
       //Mask, outputting in the same directory
       target2: {
@@ -31,6 +31,12 @@ module.exports = function(grunt) {
         defined: ["DEBUG"],
         src: "in/**/*.js",
         dest: "."
+      },
+      //Preserving blank lines when directives have been processed: using option keepLineBreaks
+      target6: {
+        src: "in/*.js",
+        dest: ".",
+        keepLineBreaks: true
       }
     }
   });
