@@ -3,6 +3,7 @@
   "description": "Grunt preprocessor plugin",
   "version": "0.1.0",
   "homepage": "https://github.com/antivanov/grunt-prepr",
+  "main": "index.js",
   "author": {
     "name": "Anton Ivanov",
     "url": "https://github.com/antivanov"
@@ -25,6 +26,9 @@
   },
   "scripts": {
     "test": "grunt jasmine:unit"
+  },
+  "dependencies": {
+    "through": "^2.3.8"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "~0.6.1",
